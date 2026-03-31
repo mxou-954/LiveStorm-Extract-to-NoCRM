@@ -1,6 +1,6 @@
 # Webinar to CRM
 
-Script Python qui lit un fichier Excel d'export de webinar et met à jour automatiquement les fiches leads correspondantes dans **noCRM.io** en enrichissant leur description avec les informations de participation.
+Script Python qui lit un fichier Excel d'export **LiveStorm** et met à jour automatiquement les fiches leads correspondantes dans **noCRM.io** en enrichissant leur description avec les informations de participation. Parfait pour les exports natifs de LiveStorm.
 
 ---
 
@@ -77,7 +77,7 @@ python main.py
 
 ## Format attendu du fichier Excel
 
-Le fichier doit contenir au minimum les colonnes suivantes (les autres sont supprimées automatiquement) :
+Le fichier doit contenir les colonnes suivantes (les autres sont supprimées automatiquement) :
 
 | Colonne        | Description                          |
 |----------------|--------------------------------------|
@@ -94,25 +94,33 @@ Le fichier doit contenir au minimum les colonnes suivantes (les autres sont supp
 
 ## Format attendu des descriptions noCRM
 
-Le script s'appuie sur la structure des descriptions noCRM pour localiser le bon bloc contact. Chaque bloc est séparé par une ligne de tirets (`-----`) et doit contenir une ligne `Email :` pour être identifié.
+Le script s'appuie sur la structure des descriptions noCRM pour localiser le bon bloc contact. Chaque bloc est séparé par une ligne de tirets (`----------`) et doit contenir une ligne `Email :` pour être identifié.
 
-Exemple de bloc attendu :
-
-```
-Prénom Nom
-Email : prenom.nom@exemple.com
-Téléphone : +33 6 00 00 00 00
-Source : Newsletter
------
-```
-
-Après exécution, la ligne `Source` sera complétée :
+Exemple de description avec plusieurs contacts :
 
 ```
-Source : Newsletter, Prénom Nom a participé au Webinar xxx avec un taux de présence de 80%
+----------
+Nom : John Doe
+Fonction : Product Manager
+Téléphone : +33 x xx xx xx xx
+Email : john.doe@xxxx.com
+Source : https://www.linkedin.com/in/xxxxxxxxxxxx/
+----------
+Nom : Jane Doe
+Fonction : Owner
+Téléphone : +33 x xx xx xx xx
+Email : jane.doe@xxxx.com
+Source : https://www.linkedin.com/in/xxxxxxxxxxxx/
+----------
 ```
 
-Si la ligne `Source` est absente, elle sera ajoutée automatiquement.
+Le script identifie le bloc dont la ligne `Email :` correspond à l'adresse du participant LiveStorm, puis complète la ligne `Source :` :
+
+```
+Source : https://www.linkedin.com/in/xxxxxxxxxxxx/, John Doe a participé au Webinar xxx avec un taux de présence de 80%
+```
+
+Si la ligne `Source` est absente du bloc, elle sera ajoutée automatiquement.
 
 ---
 
