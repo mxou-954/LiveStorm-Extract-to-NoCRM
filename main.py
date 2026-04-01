@@ -1,4 +1,5 @@
 from openpyxl import load_workbook
+from openpyxl.styles import Font, Alignment, Border, Side, PatternFill, NamedStyle
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -80,7 +81,7 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-data_repository = "/webinar_to_crm/data_xlsx"
+data_repository = r"C:\Users\margaux\Desktop\webinar_to_crm\data_xlsx"
 data_sheet_name = os.listdir(data_repository)
 
 if not data_sheet_name : 
@@ -135,7 +136,7 @@ print(leads)
 offset = 0
 limit = 100
 api_calls = 0
-
+lead_not_in_crm = []
 for lead in leads:
     params = {"limit": limit, "offset": offset, "email": lead["Email"]}
     response = requests.get(f"{BASE_URL}/leads", headers=HEADERS, params=params)
@@ -147,9 +148,11 @@ for lead in leads:
 
     api_leads = response.json()
 
+    
     if not api_leads:
         print("=> Call API :", api_calls)
         print("=> Pas de lead connu pour l'adresse email :", lead["Email"])
+        lead_not_in_crm.append(lead["Email"])
         continue
 
     api_lead = api_leads[0]
@@ -194,5 +197,13 @@ for lead in leads:
     print("=> Call API :", api_calls)
     print(f"=> Email : {lead['Email']} --- Lead : {lead_title} --- ID : {lead_id}")
 
+red_text = Font(color="FF0000")
+for row in ws1.iter_rows(min_row=2, max_row=4):
+    for lead in lead_not_in_crm :
+        for cell in row : 
+            if lead in cell.value : 
+                cell.font = red_text
+
 wb.save("data_cleaned/data_cleaned.xlsx")
 print("=> Document enregistré")
+
